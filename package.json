@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "description": "REST API for the Monoprice MPR-6ZHMAUT Home Audio Distribution SYstem",
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "cors-start": "PORT=8181 CORS=true node app.js"
   },
   "repository": {
     "type": "git",
@@ -19,6 +20,6 @@
     "express": "^4.12.4",
     "morgan": "^1.6.1",
     "body-parser": "^1.12.4",
-    "serialport": "^2.0.2"
+    "serialport": "^7.0.2"
   }
 }
