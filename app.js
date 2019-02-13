@@ -1,9 +1,13 @@
-var express    = require("express");
-var morgan     = require("morgan");
-var bodyParser = require("body-parser");
+var express      = require("express");
+var morgan       = require("morgan");
+var bodyParser   = require("body-parser");
 const SerialPort = require("serialport");
-const Readline = require('@serialport/parser-readline');
-var async      = require("async");
+const Readline   = require('@serialport/parser-readline');
+var async        = require("async");
+const GoogleHome = require('google-home-push');
+const got        = require('got');
+const nhl        = require('./NHL.js');
+const schedule   = require('node-schedule');
 
 var app = express();
 var logFormat = "'[:date[iso]] - :remote-addr - :method :url :status :response-time ms - :res[content-length]b'";
@@ -13,6 +17,8 @@ app.use(bodyParser.text({type: '*/*'}));
 const ReQuery  = /^true$/i.test(process.env.REQUERY);
 const UseCORS  = /^true$/i.test(process.env.CORS);
 const AmpCount = process.env.AMPCOUNT || 1;
+const googleIP = process.env.GOOGLE_IP || '10.0.1.1'
+const myHome = new GoogleHome(googleIP);
 var device     = process.env.DEVICE || "/dev/ttyUSB0";
 var connection = new SerialPort(device, {
   baudRate: 9600
@@ -194,6 +200,29 @@ connection.on("open", function () {
       }
     );
   });
+
+  app.get('/google/talk', function(req, res) {
+     var phrase = req.query.phrase;
+     if(!phrase) {
+       phrase = "I ain't saying nothing"
+    }
+
+    myHome.speak(phrase);
+    res.send(phrase);
+  });
+
+  schedule.scheduleJob('0 8-18/4 * * *', function() {
+    nhl.getNextGame();
+  });
+
+  schedule.scheduleJob('1 8-18/4 * * *', function() {
+    nhl.getNextRaptorGame();
+  });
+
+//  setInterval(function() {
+//    console.log('10 seconds');
+//    const nextGame = nhl.getNextRaptorGame();
+//  }, 5000);
 
   app.listen(process.env.PORT || 8181);
 });
