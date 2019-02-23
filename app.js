@@ -9,6 +9,9 @@ const got        = require('got');
 const nhl        = require('./NHL.js');
 const schedule   = require('node-schedule');
 
+require('console-stamp')(console, { pattern: 'dd/mm/yyyy HH:MM:ss.l' });
+
+
 var app = express();
 var logFormat = "'[:date[iso]] - :remote-addr - :method :url :status :response-time ms - :res[content-length]b'";
 app.use(morgan(logFormat));
@@ -212,17 +215,14 @@ connection.on("open", function () {
   });
 
   schedule.scheduleJob('0 8-18/4 * * *', function() {
-    nhl.getNextGame();
+    nhl.getNextLeafGame();
   });
 
   schedule.scheduleJob('1 8-18/4 * * *', function() {
     nhl.getNextRaptorGame();
   });
 
-//  setInterval(function() {
-//    console.log('10 seconds');
-//    const nextGame = nhl.getNextRaptorGame();
-//  }, 5000);
+  nhl.getNextRaptorGame();
 
   app.listen(process.env.PORT || 8181);
 });

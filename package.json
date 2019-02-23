@@ -18,6 +18,7 @@
   "dependencies": {
     "async": "^1.5.0",
     "body-parser": "^1.12.4",
+    "console-stamp": "^0.2.7",
     "express": "^4.12.4",
     "google-home-push": "^1.1.2",
     "got": "^9.6.0",
