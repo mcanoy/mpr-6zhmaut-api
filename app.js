@@ -214,6 +214,16 @@ connection.on("open", function () {
     res.send(phrase);
   });
 
+  app.get('/next/leafs', function(req, res) {
+    nhl.getNextLeafGame();
+    res.send('OK');
+  });
+
+  app.get('/next/raptor', function(req, res) {
+    nhl.getNextRaptorGame();
+    res.send('OK');
+  });
+
   schedule.scheduleJob('0 8-18/4 * * *', function() {
     nhl.getNextLeafGame();
   });

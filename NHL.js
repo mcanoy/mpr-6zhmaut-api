@@ -39,7 +39,7 @@ module.exports = {
   },
 
   getNextRaptorGame: function () {
-    const raptorId = 1610612761;
+    const raptorId = "1610612761";
     const today = moment(new Date());
     const year = moment(new Date());
     if(year.isBefore(`${year.format('YYYY')}-07-01`)) {
@@ -55,7 +55,7 @@ module.exports = {
 
         if(gameDate.diff(today.startOf('day')) === 0) {
           gameTime = moment(schedule[i].startTimeUTC);
-          var competitor = schedule[i].vTeam.teamId === raptorId ? schedule[i].hTeam.TeamId : schedule[i].vTeam.teamId;
+          const competitor = (raptorId === schedule[i].vTeam.teamId) ? schedule[i].hTeam.teamId : schedule[i].vTeam.teamId;
           var competitorName = "";
           for(i=0; i< teams.length; i++) {
             if(teams[i].teamId === competitor) {

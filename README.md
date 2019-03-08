@@ -16,6 +16,8 @@ Monoprice sells this wacky [6 zone amp](https://www.monoprice.com/product?p_id=1
 
 `CORS = <true|false>` - respond to a CORS request with an `Access-Control-Allow-Origin=*` (defaults to false)
 
+`GOOGLE_IP - `The IP or address of the Google Home device. It's recommended that this app not be available via the internet since this functionality is not secure`
+
 ## Running the server
 
     PORT=8181 npm start
