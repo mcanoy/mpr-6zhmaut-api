@@ -29,8 +29,8 @@ module.exports = {
               console.log(text);
               myHome.speak(text);
             } else {
-              console.log(`The next Maple Leafs hockey game is on ${day.format('dddd')}`);
-              myHome.speak(`The next Maple Leafs hockey game is on ${day.format('dddd')}`);
+              console.log(`The next Leafs game is on ${day.format('dddd')}`);
+              myHome.speak(`The next Leafs game is on ${day.format('dddd')}`);
             }
         }
       }).catch(error => {
@@ -52,7 +52,6 @@ module.exports = {
       var gameDate;
       for(i=0; i<schedule.length; i++) {
         gameDate = moment(schedule[i].startDateEastern);
-
         if(gameDate.diff(today.startOf('day')) === 0) {
           gameTime = moment(schedule[i].startTimeUTC);
           const competitor = (raptorId === schedule[i].vTeam.teamId) ? schedule[i].hTeam.teamId : schedule[i].vTeam.teamId;
@@ -63,13 +62,19 @@ module.exports = {
               break;
             }
           }
+
+          const nextGame = `The next Raptors game is today at ${gameTime.format('H:mma')} against ${competitorName}`;
           
-          console.log(`The next Raptors basketball game is today at ${gameTime.format('H:mma')} against ${competitorName}`);
-          myHome.speak(`The next Raptors basketball game is today at ${gameTime.format('H:mma')} against ${competitorName}`);
+          console.log(nextGame);
+          myHome.speak(nextGame);
+          break;
+        } else if(gameDate.diff(today.startOf('day'), 'days')  > 7) {
+          console.log('The next Raptors game is in ' + gameDate.diff(today.startOf('day'), 'days') + ' days');
+          myHome.speak('The next Raptors game is in ' + gameDate.diff(today.startOf('day'), 'days') + ' days');
           break;
         } else if(gameDate.diff(today.startOf('day')) > 0) {
-          console.log(`The next Raptors basketball game is on ${gameDate.format('dddd')}`);
-          myHome.speak(`The next Raptors basketball game is on ${gameDate.format('dddd')}`);
+          console.log(`The next Raptors game is on ${gameDate.format('dddd')}`);
+          myHome.speak(`The next Raptors game is on ${gameDate.format('dddd')}`);
           break;
         }
       }

@@ -7,6 +7,7 @@ var async        = require("async");
 const GoogleHome = require('google-home-push');
 const got        = require('got');
 const nhl        = require('./NHL.js');
+const birthdays  = require('./birthdays.js');
 const schedule   = require('node-schedule');
 
 require('console-stamp')(console, { pattern: 'dd/mm/yyyy HH:MM:ss.l' });
@@ -232,8 +233,12 @@ connection.on("open", function () {
     nhl.getNextRaptorGame();
   });
 
-  nhl.getNextRaptorGame();
+  schedule.scheduleJob('45 7 * * *', function() {
+    birthdays.nextBirthday();
+  });
 
+//  nhl.getNextRaptorGame();
+   birthdays.nextBirthday();
   app.listen(process.env.PORT || 8181);
 });
 
