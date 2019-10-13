@@ -225,6 +225,11 @@ connection.on("open", function () {
     res.send('OK');
   });
 
+  app.get('/next/birthday', function(req, res) {
+    birthdays.nextBirthday();
+    res.send('OK');
+  });
+
   schedule.scheduleJob('0 8-18/4 * * *', function() {
     nhl.getNextLeafGame();
   });
