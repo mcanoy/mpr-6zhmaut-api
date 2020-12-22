@@ -4,10 +4,12 @@ var bodyParser   = require("body-parser");
 const SerialPort = require("serialport");
 const Readline   = require('@serialport/parser-readline');
 var async        = require("async");
-const GoogleHome = require('google-home-push');
+const talker     = require('./GoogleHomeDevice.js');
 const got        = require('got');
 const nhl        = require('./NHL.js');
 const birthdays  = require('./birthdays.js');
+const content    = require('./content.js');
+const school     = require('./school.js');
 const schedule   = require('node-schedule');
 
 require('console-stamp')(console, { pattern: 'dd/mm/yyyy HH:MM:ss.l' });
@@ -21,8 +23,6 @@ app.use(bodyParser.text({type: '*/*'}));
 const ReQuery  = /^true$/i.test(process.env.REQUERY);
 const UseCORS  = /^true$/i.test(process.env.CORS);
 const AmpCount = process.env.AMPCOUNT || 1;
-const googleIP = process.env.GOOGLE_IP || '10.0.1.1'
-const myHome = new GoogleHome(googleIP);
 var device     = process.env.DEVICE || "/dev/ttyUSB0";
 var connection = new SerialPort(device, {
   baudRate: 9600
@@ -207,12 +207,28 @@ connection.on("open", function () {
 
   app.get('/google/talk', function(req, res) {
      var phrase = req.query.phrase;
+     var accent = req.query.accent;
      if(!phrase) {
        phrase = "I ain't saying nothing"
     }
 
-    myHome.speak(phrase);
+    if(accent) {
+      talker.speakWithAccent(phrase, accent);
+    } else {
+      talker.speak(phrase);
+    }
+    
     res.send(phrase);
+  });
+
+  app.get('/all', function(req, res) {
+    responseContent = content.getAllData();
+    res.send(responseContent);
+  });
+
+  app.get('/content/reload', function(req, res) {
+    responseContent = content.reload();
+    res.send(responseContent);
   });
 
   app.get('/next/leafs', function(req, res) {
@@ -230,11 +246,11 @@ connection.on("open", function () {
     res.send('OK');
   });
 
-  schedule.scheduleJob('0 8-18/4 * * *', function() {
+  schedule.scheduleJob('0 12-18/4 * * *', function() {
     nhl.getNextLeafGame();
   });
 
-  schedule.scheduleJob('1 8-18/4 * * *', function() {
+  schedule.scheduleJob('10 12-18/4 * * *', function() {
     nhl.getNextRaptorGame();
   });
 
@@ -242,8 +258,8 @@ connection.on("open", function () {
     birthdays.nextBirthday();
   });
 
-//  nhl.getNextRaptorGame();
-   birthdays.nextBirthday();
+  school.setSchedule();
+  birthdays.nextBirthday();
   app.listen(process.env.PORT || 8181);
 });
 

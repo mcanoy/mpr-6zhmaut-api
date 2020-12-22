@@ -1,11 +1,9 @@
-const fs = require('fs');
-const teams = JSON.parse(fs.readFileSync('/home/pi/code/mpr-6zhmaut-api/teams.json', 'utf8')).league.standard;
-
-const got = require('got');
-var moment = require('moment');
-const GoogleHome = require('google-home-push');
-const googleIP = process.env.GOOGLE_IP || '10.0.1.1'
-const myHome = new GoogleHome(googleIP);
+const fs            = require('fs');
+const filesLocation = process.env.fileStore + "/teams.json";
+const teams         = JSON.parse(fs.readFileSync(filesLocation, 'utf8')).league.standard;
+const got           = require('got');
+var moment          = require('moment');
+const talker        = require('./GoogleHomeDevice.js');
 
 module.exports = {
 
@@ -27,10 +25,10 @@ module.exports = {
               }
               var text = `The next Leafs game is today at ${gameTime.format('H:mma')} against the ${team}`
               console.log(text);
-              myHome.speak(text);
+              talker.speak(text);
             } else {
               console.log(`The next Leafs game is on ${day.format('dddd')}`);
-              myHome.speak(`The next Leafs game is on ${day.format('dddd')}`);
+              talker.speak(`The next Leafs game is on ${day.format('dddd')}`);
             }
         }
       }).catch(error => {
@@ -66,15 +64,15 @@ module.exports = {
           const nextGame = `The next Raptors game is today at ${gameTime.format('H:mma')} against ${competitorName}`;
           
           console.log(nextGame);
-          myHome.speak(nextGame);
+          talker.speak(nextGame);
           break;
         } else if(gameDate.diff(today.startOf('day'), 'days')  > 7) {
           console.log('The next Raptors game is in ' + gameDate.diff(today.startOf('day'), 'days') + ' days');
-          myHome.speak('The next Raptors game is in ' + gameDate.diff(today.startOf('day'), 'days') + ' days');
+          talker.speak('The next Raptors game is in ' + gameDate.diff(today.startOf('day'), 'days') + ' days');
           break;
         } else if(gameDate.diff(today.startOf('day')) > 0) {
           console.log(`The next Raptors game is on ${gameDate.format('dddd')}`);
-          myHome.speak(`The next Raptors game is on ${gameDate.format('dddd')}`);
+          talker.speak(`The next Raptors game is on ${gameDate.format('dddd')}`);
           break;
         }
       }
