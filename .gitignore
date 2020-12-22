@@ -1,3 +1,6 @@
 node_modules
 *.log
 .idea
+
+start*.sh
+content.json

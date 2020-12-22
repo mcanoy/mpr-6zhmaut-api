@@ -1,7 +1,16 @@
-var express = require("express");
-var morgan = require("morgan");
-var bodyParser = require("body-parser");
-var async = require("async");
+var express      = require("express");
+var morgan       = require("morgan");
+var bodyParser   = require("body-parser");
+var async        = require("async");
+const talker     = require('./GoogleHomeDevice.js');
+const got        = require('got');
+const nhl        = require('./NHL.js');
+const birthdays  = require('./birthdays.js');
+const content    = require('./content.js');
+const school     = require('./school.js');
+const schedule   = require('node-schedule');
+
+require('console-stamp')(console, { pattern: 'dd/mm/yyyy HH:MM:ss.l' });
 
 var app = express();
 var logFormat = "'[:date[iso]] - :remote-addr - :method :url :status :response-time ms - :res[content-length]b'";
@@ -9,7 +18,7 @@ app.use(morgan(logFormat));
 app.use(bodyParser.text({ type: '*/*' }));
 
 const ReQuery = /^true$/i.test(process.env.REQUERY);
-const UseCORS = /^true$/i.test(process.env.CORS);
+const UseCORS = /^true$/i.test(process.env.CORS); 
 const AmpCount = process.env.AMPCOUNT || 1;
 const BaudRate = parseInt(process.env.BAUDRATE || 9600);
 const SerialPort = require("serialport");
@@ -47,9 +56,12 @@ connection.on("open", function () {
     next();
   });
 
+  console.log("cors: " + UseCORS);
+
   parser.on('data', function (data) {
     console.log(data);
     var zone = data.toString("ascii").match(/#>(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/);
+
     if (zone != null) {
       zones[zone[1]] = {
         "zone": zone[1],
@@ -214,5 +226,60 @@ connection.on("open", function () {
     );
   });
 
+  app.get('/google/talk', function(req, res) {
+     var phrase = req.query.phrase;
+     var accent = req.query.accent;
+     if(!phrase) {
+       phrase = "I ain't saying nothing"
+    }
+
+    if(accent) {
+      talker.speakWithAccent(phrase, accent);
+    } else {
+      talker.speak(phrase);
+    }
+    
+    res.send(phrase);
+  });
+
+  app.get('/all', function(req, res) {
+    responseContent = content.getAllData();
+    res.send(responseContent);
+  });
+
+  app.get('/content/reload', function(req, res) {
+    responseContent = content.reload();
+    res.send(responseContent);
+  });
+
+  app.get('/next/leafs', function(req, res) {
+    nhl.getNextLeafGame();
+    res.send('OK');
+  });
+
+  app.get('/next/raptor', function(req, res) {
+    nhl.getNextRaptorGame();
+    res.send('OK');
+  });
+
+  app.get('/next/birthday', function(req, res) {
+    birthdays.nextBirthday();
+    res.send('OK');
+  });
+
+  schedule.scheduleJob('0 12-18/4 * * *', function() {
+    nhl.getNextLeafGame();
+  });
+
+  schedule.scheduleJob('10 12-18/4 * * *', function() {
+    nhl.getNextRaptorGame();
+  });
+
+  schedule.scheduleJob('45 7 * * *', function() {
+    birthdays.nextBirthday();
+  });
+
+  school.setSchedule();
+  birthdays.nextBirthday();
   app.listen(process.env.PORT || 8181);
 });
