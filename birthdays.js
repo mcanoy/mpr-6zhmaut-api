@@ -13,10 +13,10 @@ module.exports = {
       var nextBirthday = moment(birthday.date);
       nextBirthday.year(moment().year());
 
-      daysDiff = nextBirthday.diff(moment(), 'days');
+      daysDiff = nextBirthday.diff(moment().startOf('day'), 'days');
       if(daysDiff < 0) { //this year's birthday has passed. Check next year
         nextBirthday.year(nextBirthday.year()+1);
-        daysDiff  = nextBirthday.diff(moment(), 'days');
+        daysDiff  = nextBirthday.diff(moment().startOf('day'), 'days');
       }
 
       // console.log(birthday);
@@ -26,7 +26,8 @@ module.exports = {
         nextBirthdayMessage = "It's " + birthday.person + "'s birthday today"
         talker.speak(nextBirthdayMessage);
       } else if(daysDiff < birthday.notifyDays) {
-        nextBirthdayMessage = birthday.person + " has a birthday in " + daysDiff + " days";
+        var day = daysDiff == 1 ? ' day' : ' days';
+        nextBirthdayMessage = birthday.person + " has a birthday in " + daysDiff + day;
         console.log(nextBirthdayMessage);
         talker.speak(nextBirthdayMessage);
       }

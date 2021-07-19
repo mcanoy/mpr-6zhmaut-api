@@ -1,5 +1,5 @@
 const fs = require('fs');
-const fileLocation = process.env.fileStore + "/content1.json";
+const fileLocation = process.env.fileStore + "/content.json";
 var contentData;
 
 try {

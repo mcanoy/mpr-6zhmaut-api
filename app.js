@@ -259,7 +259,7 @@ connection.on("open", function () {
   });
 
   school.setSchedule();
-  birthdays.nextBirthday();
+  nhl.getNextRaptorGame();
   app.listen(process.env.PORT || 8181);
 });
 
